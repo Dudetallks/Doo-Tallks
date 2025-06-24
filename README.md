@@ -1,49 +1,65 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Doo Tallks</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
       background-color: #0a0f1c;
       color: #00bcd4;
       font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
       text-align: center;
-      padding-top: 80px;
     }
+
     h1 {
       font-size: 2.5rem;
-      color: #2196f3;
+      margin-bottom: 20px;
     }
-    #orb {
+
+    .orb {
       width: 100px;
       height: 100px;
-      background-image: url('https://dudetallks.github.io/assets/orb.png'); /* Make sure this path is correct */
-      background-size: cover;
-      border-radius: 50%;
-      margin: 20px auto;
-      animation: orbGlow 2s infinite linear;
+      background: url('animation.png') no-repeat center/contain;
+      animation: spin 4s linear infinite;
+      margin-bottom: 20px;
     }
-    @keyframes orbGlow {
-      0% { transform: rotate(0deg) scale(1); opacity: 1; }
-      50% { transform: rotate(180deg) scale(1.05); opacity: 0.8; }
-      100% { transform: rotate(360deg) scale(1); opacity: 1; }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #status, #output {
+      font-size: 1rem;
+      margin-top: 10px;
+      max-width: 90%;
     }
   </style>
 </head>
 <body>
-  <h1>Doo-Tallks 🤖</h1>
-  <div id="orb"></div>
+  <h1>Doo-Tallks</h1>
+  <div id="orb" class="orb"></div>
   <p id="status">Awaiting "Hey dude"...</p>
   <p id="output"></p>
 
   <script>
     const statusText = document.getElementById("status");
     const output = document.getElementById("output");
-    const orb = document.getElementById("orb");
     let isListening = true;
-    let apiKey = "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";
+    let apiKey = "sk-GM5kA3asJwEXAMPLEdummYKEY1234567890"; // Replace this with your actual OpenAI API Key
+
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -78,7 +94,7 @@
 
         if (command.includes("shutdown")) {
           statusText.textContent = "Mic stopped.";
-          orb.style.animation = "none";
+          document.getElementById("orb").style.display = "none";
           isListening = false;
           return;
         }
@@ -97,7 +113,7 @@
         } else {
           statusText.textContent = "Thinking...";
           const gptReply = await getGPTResponse(command);
-          await sleep(10000); // 10 second gap
+          await sleep(10000);
           output.textContent = `Doo-Tallks: ${gptReply}`;
         }
 
