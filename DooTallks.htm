@@ -1,93 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Doo Tallks - Voice AI</title>
+  <title>Doo Tallks</title>
   <style>
     body {
-      background: #0f0f0f;
-      color: #fff;
       font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    h1 {
-      color: #00ffd5;
-      margin-bottom: 20px;
-    }
-    #output {
-      background: #1a1a1a;
-      border: 1px solid #00ffd5;
-      padding: 20px;
-      width: 80%;
-      max-width: 600px;
-      border-radius: 10px;
       text-align: center;
-      margin-bottom: 20px;
+      padding: 50px;
     }
     button {
-      padding: 15px 30px;
-      background: #00ffd5;
-      color: #000;
       font-size: 18px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #00bfa3;
+      padding: 10px 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Doo Tallks 🔊</h1>
-  <div id="output">Press the mic and speak...</div>
+  <h1>Doo Tallks 🤖</h1>
   <button onclick="startListening()">🎙️ Start Talking</button>
+  <p id="output">Awaiting command...</p>
 
   <script>
-    const output = document.getElementById('output');
+    const output = document.getElementById("output");
 
     function startListening() {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-IN';
+      recognition.lang = 'en-US';
       recognition.start();
 
       recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        output.innerText = `You said: "${transcript}"`;
-        respondToVoice(transcript);
-      };
-
-      recognition.onerror = function(event) {
-        output.innerText = "Error: " + event.error;
-      };
-    }
-
-    function respondToVoice(command) {
-      let response = "";
-      if (command.includes("open youtube")) {
-        response = "Opening YouTube...";
-        window.open("https://www.youtube.com", "_blank");
-      } else if (command.includes("what time")) {
-        const time = new Date().toLocaleTimeString();
-        response = `Abhi ka time hai ${time}`;
-      } else if (command.includes("hello") || command.includes("hi")) {
-        response = "Hello bhai! Bol kya kaam hai?";
-      } else {
-        response = "Yeh command mere syllabus ke bahar hai bhai!";
-      }
-      speak(response);
-    }
-
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-IN';
-      window.speechSynthesis.speak(utterance);
-    }
-  </script>
-</body>
-</html>
+        const command = event.results[0][0].transcript.toLowerCase();
+        output.textContent = "
