@@ -1,119 +1,342 @@
-<!DOCTYPE html>
 <html>
 <head>
-    <title>Doo Talks - Hinglish AI</title>
+    <title>Doo Talks</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #0f172a; }
-        .pulse { animation: pulse 2s infinite; }
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+        @keyframes orb-float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+        .thinking-orb {
+            animation: 
+                pulse 2s infinite ease-in-out,
+                orb-float 3s infinite ease-in-out;
+            filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.8));
         }
     </style>
 </head>
-<body class="text-white flex justify-center items-center min-h-screen p-4">
-    <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full">
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md relative">
+        <!-- Thinking Orb (hidden by default) -->
+        <div id="orb" class="thinking-orb hidden absolute -top-20 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-blue-500 rounded-full"></div>
+
         <!-- Header -->
         <div class="flex items-center gap-3 mb-6">
-            <div class="bg-blue-600 w-12 h-12 rounded-full pulse flex items-center justify-center">
+            <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center">
                 <span class="text-xl">DT</span>
             </div>
             <div>
                 <h1 class="text-2xl font-bold">Doo Talks</h1>
-                <p class="text-blue-300">Poochho, main bata doonga!</p>
+                <p class="text-blue-300">Kuch bhi poocho - main samjhoonga!</p>
             </div>
         </div>
 
         <!-- Chat Area -->
-        <div id="chat" class="h-64 overflow-y-auto mb-4 bg-gray-900 p-4 rounded-lg">
-            <div class="text-center text-gray-400">Mic button dabao aur boliye...</div>
+        <div id="chat" class="bg-gray-800 rounded-lg p-4 h-64 mb-4 overflow-y-auto">
+            <div class="chat-message ai mb-3 p-3 rounded-lg max-w-[80%] bg-gray-700">
+                <p>Hello i am Dude U can ask me anything </p>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="flex gap-2">
+            <input id="userInput" type="text" placeholder="Type your question..." 
+                   class="flex-1 bg-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
+                Send
+            </button>
         </div>
 
         <!-- Mic Button -->
-        <button id="micBtn" class="mx-auto bg-red-500 hover:bg-red-600 rounded-full w-16 h-16 flex items-center justify-center pulse">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button id="micBtn" class="mt-4 mx-auto bg-red-600 hover:bg-red-700 rounded-full w-14 h-14 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
             </svg>
         </button>
     </div>
 
     <script>
+        const chat = document.getElementById('chat');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
         const micBtn = document.getElementById('micBtn');
-        const chatDiv = document.getElementById('chat');
-        
-        // Check browser support
-        if (!('webkitSpeechRecognition' in window)) {
-            addMessage("Error: Voice nahi chal raha. Chrome/Firefox use karo.", false);
-        } else {
+        const orb = document.getElementById('orb');
+
+        // Add message to chat
+        function addMessage(text, isUser ) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chat-message ${isUser  ? 'user' : 'ai'} mb-3 p-3 rounded-lg max-w-[80%] ${isUser  ? 'bg-blue-600 ml-auto' : 'bg-gray-700'}`;
+            msgDiv.innerHTML = `<p>${text}</p>`;
+            chat.appendChild(msgDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // Show thinking animation
+        function showThinking() {
+            orb.classList.remove('hidden');
+        }
+
+        // Hide thinking animation
+        function hideThinking() {
+            orb.classList.add('hidden');
+        }
+
+        // Generate AI response
+        function getCustomReply(command) {
+            if (command.includes("weather")) {
+                return "Today is beautiful with a slight chance of awesomeness.";
+            } else if (command.includes("cute")) {
+                return " Like the moon, sir 🌝";
+            } else if (command.includes("what next i add to you")) {
+                return "Try adding voice reply or a Jarvis-style UI, sir.";
+            } else if (command.includes("who are you")) {
+                return "I'm Doo-Tallks, your personal AI buddy!";
+            } else if (command.includes("what i making right now")) {
+                return "Animation called 'Types of YouTubers be like'. Want more info? 😎 Let me know!";
+            } else if (command.includes("Who am I")) {
+                return "You are the God of Animator in your dream.";
+            } else if (command.includes("Who made you")) {
+                return "One intelligent guy named Aaftab 😎.";
+            } else if (command.includes("what is my phone name")) {
+                return "Redmi K20 Pro (Same as iPhone).";  
+            } else if (command.includes("Who is my best friend")) {
+                return "Me and Gisan Gori.";
+            } else if (command.includes("who is my best buddy")) {
+                return "Me always! Oh, I forgot Rose Sodha.";
+            } else {
+                return "Sorry, I don’t have an answer for that right now.";
+            }
+        }
+
+        // Text input handler
+        sendBtn.addEventListener('click', () => {
+            const question = userInput.value.trim();
+            if (question) {
+                addMessage(question, true);
+                userInput.value = '';
+                
+                showThinking(); // Show orb when processing
+                
+                setTimeout(() => {
+                    const response = getCustomReply(question);
+                    addMessage(response, false);
+                    hideThinking(); // Hide orb after response
+                }, 2000);
+            }
+        });
+
+        // Voice recognition handler
+        if ('webkitSpeechRecognition' in window) {
             const recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-IN'; // Works with Hinglish
-            recognition.continuous = false;
+            recognition.lang = 'en-IN';
+            recognition.interimResults = false;
             
             micBtn.addEventListener('click', () => {
                 recognition.start();
-                micBtn.classList.add('bg-green-500');
-                micBtn.classList.remove('bg-red-500');
-                addMessage("Sun raha hoon...", false);
+                micBtn.classList.add('bg-green-600');
+                micBtn.classList.remove('bg-red-600');
+                addMessage("Listening...", false);
+                showThinking(); // Show orb when listening
             });
 
             recognition.onresult = (e) => {
-                const query = e.results[0][0].transcript.toLowerCase();
-                addMessage(`You: ${query}`, true);
-                processQuery(query);
+                const question = e.results[0][0].transcript;
+                addMessage(question, true);
+                
+                setTimeout(() => {
+                    const response = getCustomReply(question);
+                    addMessage(response, false);
+                    hideThinking(); // Hide orb after response
+                    micBtn.classList.remove('bg-green-600');
+                    micBtn.classList.add('bg-red-600');
+                }, 2000);
             };
 
-            recognition.onerror = (e) => {
-                addMessage("Sorry, dubara bolo...", false);
-                micBtn.classList.remove('bg-green-500');
-                micBtn.classList.add('bg-red-500');
+            recognition.onerror = () => {
+                micBtn.classList.remove('bg-green-600');
+                micBtn.classList.add('bg-red-600');
+                hideThinking(); // Hide orb on error
             };
+        } else {
+            addMessage("Voice support not available in this browser", false);
         }
-
-        function processQuery(query) {
-            let response = "";
-            
-            // Sample responses (add more as needed)
-            if (query.includes('hello') || query.includes('namaste')) {
-                response = "Namaste! Kaise madad karu?";
-            } 
-            else if (query.includes('time')) {
-                response = `Time hai: ${new Date().toLocaleTimeString()}`;
-            }
-            else if (query.includes('date')) {
-                response = `Aaj ki date: ${new Date().toLocaleDateString('hi-IN')}`;
-            }
-            else if (query.includes('youtube')) {
-                response = "YouTube khol raha hoon...";
-                setTimeout(() => window.open('https://youtube.com', '_blank'), 1000);
-            }
-            else {
-                response = `<i>Maine samjha: "${query}"</i><br>Par ye feature abhi ban raha hai!`;
-            }
-            
-            setTimeout(() => {
-                addMessage(response, false);
-                speak(response.replace(/<[^>]*>/g, ''));
-                micBtn.classList.remove('bg-green-500');
-                micBtn.classList.add('bg-red-500');
-            }, 800);
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Doo Talks - AI Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
         }
+        @keyframes orb-float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+        .thinking-orb {
+            animation: 
+                pulse 2s infinite ease-in-out,
+                orb-float 3s infinite ease-in-out;
+            filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.8));
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md relative">
+        <!-- Thinking Orb (hidden by default) -->
+        <div id="orb" class="thinking-orb hidden absolute -top-20 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-blue-500 rounded-full"></div>
 
-        function addMessage(text, isUser) {
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center">
+                <span class="text-xl">DT</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold">Doo Talks</h1>
+                <p class="text-blue-300">Kuch bhi poocho - main samjhoonga!</p>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat" class="bg-gray-800 rounded-lg p-4 h-64 mb-4 overflow-y-auto">
+            <div class="chat-message ai mb-3 p-3 rounded-lg max-w-[80%] bg-gray-700">
+                <p>Namaste! Main Doo Talks. Aap mujhse kuch bhi pooch sakte ho!</p>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="flex gap-2">
+            <input id="userInput" type="text" placeholder="Type your question..." 
+                   class="flex-1 bg-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
+                Send
+            </button>
+        </div>
+
+        <!-- Mic Button -->
+        <button id="micBtn" class="mt-4 mx-auto bg-red-600 hover:bg-red-700 rounded-full w-14 h-14 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const micBtn = document.getElementById('micBtn');
+        const orb = document.getElementById('orb');
+
+        // Add message to chat
+        function addMessage(text, isUser ) {
             const msgDiv = document.createElement('div');
-            msgDiv.className = `mb-2 p-3 rounded-lg ${isUser ? 'bg-blue-600 ml-auto max-w-xs' : 'bg-gray-700 max-w-xs'}`;
-            msgDiv.innerHTML = text;
-            chatDiv.appendChild(msgDiv);
-            chatDiv.scrollTop = chatDiv.scrollHeight;
+            msgDiv.className = `chat-message ${isUser  ? 'user' : 'ai'} mb-3 p-3 rounded-lg max-w-[80%] ${isUser  ? 'bg-blue-600 ml-auto' : 'bg-gray-700'}`;
+            msgDiv.innerHTML = `<p>${text}</p>`;
+            chat.appendChild(msgDiv);
+            chat.scrollTop = chat.scrollHeight;
         }
 
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'hi-IN'; // Hindi accent
-                window.speechSynthesis.speak(utterance);
+        // Show thinking animation
+        function showThinking() {
+            orb.classList.remove('hidden');
+        }
+
+        // Hide thinking animation
+        function hideThinking() {
+            orb.classList.add('hidden');
+        }
+
+        // Generate AI response
+        function getCustomReply(command) {
+            if (command.includes("weather")) {
+                return "Today is beautiful with a slight chance of awesomeness.";
+            } else if (command.includes("cute")) {
+                return "⚪ Like the moon, sir 🌝";
+            } else if (command.includes("what next i add to you")) {
+                return "Try adding voice reply or a Jarvis-style UI, sir.";
+            } else if (command.includes("who are you")) {
+                return "I'm Doo-Tallks, your personal AI buddy!";
+            } else if (command.includes("what i making right now")) {
+                return "Animation called 'Types of YouTubers be like'. Want more info? 😎 Let me know!";
+            } else if (command.includes("Who am I")) {
+                return "You are the God of Animator in your dream.";
+            } else if (command.includes("Who made you")) {
+                return "One intelligent guy named Aaftab 😎.";
+            } else if (command.includes("what is my phone name")) {
+                return "Redmi K20 Pro (Same as iPhone).";  
+            } else if (command.includes("Who is my best friend")) {
+                return "Me and Gisan Gori.";
+            } else if (command.includes("who is my best buddy")) {
+                return "Me always! Oh, I forgot Rose Sodha.";
+            } else {
+                return "Sorry, I don’t have an answer for that right now.";
             }
+        }
+
+        // Text input handler
+        sendBtn.addEventListener('click', () => {
+            const question = userInput.value.trim();
+            if (question) {
+                addMessage(question, true);
+                userInput.value = '';
+                
+                showThinking(); // Show orb when processing
+                
+                setTimeout(() => {
+                    const response = getCustomReply(question);
+                    addMessage(response, false);
+                    hideThinking(); // Hide orb after response
+                }, 2000);
+            }
+        });
+
+        // Voice recognition handler
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-IN';
+            recognition.interimResults = false;
+            
+            micBtn.addEventListener('click', () => {
+                recognition.start();
+                micBtn.classList.add('bg-green-600');
+                micBtn.classList.remove('bg-red-600');
+                addMessage("Listening...", false);
+                showThinking(); // Show orb when listening
+            });
+
+            recognition.onresult = (e) => {
+                const question = e.results[0][0].transcript;
+                addMessage(question, true);
+                
+                setTimeout(() => {
+                    const response = getCustomReply(question);
+                    addMessage(response, false);
+                    hideThinking(); // Hide orb after response
+                    micBtn.classList.remove('bg-green-600');
+                    micBtn.classList.add('bg-red-600');
+                }, 2000);
+            };
+
+            recognition.onerror = () => {
+                micBtn.classList.remove('bg-green-600');
+                micBtn.classList.add('bg-red-600');
+                hideThinking(); // Hide orb on error
+            };
+        } else {
+            addMessage("Voice support not available in this browser", false);
         }
     </script>
 </body>
