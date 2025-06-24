@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -77,7 +78,7 @@
     function getCustomReply(command) {
       if (command.includes("weather")) {
         return "Today is beautiful with a slight chance of awesomeness.";
-      } else if (command.includes("how cute is my person beside me")) {
+      } else if (command.includes(" cute")) {
         return "⚪ Like the moon, sir 🌝";
       } else if (command.includes("what next i add to you")) {
         return "Try adding voice reply or a Jarvis-style UI sir.";
@@ -85,8 +86,20 @@
         return "I'm Doo-Tallks, your personal AI buddy!";
       } else {
         return "Sorry, I don’t have an answer for that right now.";
-      }
+      } else if (command.includes("what i makeing right now")) {
+        return "Animation called Types of youtuber be like Want more info😎 let me know";
+      } else if (command.includes("Who Im I")) {
+        return "U are God of Animator in your dream";
+      } else if (command.includes("Who make you")) {
+        return "One intelligent Guy Name Aaftab😎";
+      } else if (command.includes("what is my phone name")) {
+        return "Redmi K20 pro (Same as Iphone)";  
+      } else if (command.includes("Who is my best Friend")) {
+        return "Me and Gisan Gori";
+      } else if (command.includes("who is my Best Buddy")) {
+        return "Me always Oh i forgot Rose Sodha";
     }
+
 
     function startListening() {
       if (isListening) return;
