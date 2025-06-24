@@ -1,58 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Doo Tallks</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
+      background: #0f172a;
+      color: #f1f5f9;
       font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #38bdf8;
     }
     button {
-      font-size: 18px;
-      padding: 10px 20px;
+      background: #1e293b;
+      color: #f1f5f9;
+      font-size: 1.2rem;
+      padding: 12px 24px;
+      border: 2px solid #38bdf8;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    button:hover {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+    p {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: #94a3b8;
+    }
+    .loader {
+      border: 4px solid #1e293b;
+      border-top: 4px solid #38bdf8;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+    .show {
+      display: block;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      button {
+        font-size: 1rem;
+        padding: 10px 20px;
+      }
     }
   </style>
 </head>
 <body>
   <h1>Doo Tallks 🤖</h1>
-  <button onclick="startWakeWord()">🎙️ Say "Hey dude"</button>
+  <button onclick="startWakeWord()">🎙️ Say 'Hey dude'</button>
+  <div class="loader" id="loader"></div>
   <p id="output">Awaiting "Hey dude"...</p>
 
   <script>
     const output = document.getElementById("output");
-    let isListeningCommand = false;
+    const loader = document.getElementById("loader");
+
+    function showLoader(text) {
+      loader.classList.add("show");
+      output.textContent = text;
+    }
+
+    function hideLoader() {
+      loader.classList.remove("show");
+    }
 
     function startWakeWord() {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
-      recognition.start();
-      output.textContent = "Say: Hey dude...";
+
+      recognition.onstart = () => {
+        showLoader("🎧 Listening for 'Hey dude'...");
+      };
 
       recognition.onresult = function(event) {
+        hideLoader();
         const transcript = event.results[0][0].transcript.toLowerCase();
         output.textContent = `You said: "${transcript}"`;
 
         if (transcript.includes("hey dude")) {
-          output.textContent = "Yo! I'm listening now...";
-          startCommandMode(); // Start listening for real commands
+          showLoader("🎤 Listening for command...");
+          startCommandMode();
         } else {
           output.textContent = "Say 'Hey dude' to activate.";
         }
       };
 
       recognition.onerror = () => {
-        output.textContent = "Mic error. Try again.";
+        hideLoader();
+        output.textContent = "Mic error. Please allow mic access.";
       };
+
+      recognition.start();
     }
 
     function startCommandMode() {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
-      recognition.start();
-      output.textContent = "Listening for command...";
+
+      recognition.onstart = () => {
+        showLoader("🎤 Listening for command...");
+      };
 
       recognition.onresult = function(event) {
+        hideLoader();
         const command = event.results[0][0].transcript.toLowerCase();
         output.textContent = `Command: "${command}"`;
 
@@ -67,14 +144,28 @@
           output.textContent = "Time is: " + now.toLocaleTimeString();
         } else if (command.includes("hello")) {
           output.textContent = "Hello bro! 😎";
-        } else {
+        }
+
+        // 💬 Smart Q&A Section
+        else if (command.includes("your name")) {
+          output.textContent = "I am Doo Tallks — your AI buddy 😎";
+        } else if (command.includes("how are you")) {
+          output.textContent = "I'm feeling smart today! 💡";
+        } else if (command.includes("what can you do")) {
+          output.textContent = "I can open apps, tell time, and follow your voice commands!";
+        }
+
+        else {
           output.textContent = "Command not recognized.";
         }
       };
 
-      recognition.onerror = function() {
-        output.textContent = "Error during command recognition.";
+      recognition.onerror = () => {
+        hideLoader();
+        output.textContent = "Mic error. Try again.";
       };
+
+      recognition.start();
     }
   </script>
 </body>
