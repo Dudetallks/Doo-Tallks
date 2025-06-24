@@ -29,4 +29,25 @@
 
       recognition.onresult = function(event) {
         const command = event.results[0][0].transcript.toLowerCase();
-        output.textContent = "
+        output.textContent = "You said: " + command;
+
+        if (command.includes("youtube")) {
+          window.open("https://youtube.com", "_blank");
+        } else if (command.includes("what's the time") || command.includes("time")) {
+          const now = new Date();
+          const time = now.toLocaleTimeString();
+          output.textContent = "Current time is " + time;
+        } else if (command.includes("hello")) {
+          output.textContent = "Hello, bro! 😎";
+        } else {
+          output.textContent = "Sorry, I didn't get that.";
+        }
+      };
+
+      recognition.onerror = function() {
+        output.textContent = "Error recognizing voice.";
+      };
+    }
+  </script>
+</body>
+</html>
