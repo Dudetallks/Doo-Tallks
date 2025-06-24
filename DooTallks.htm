@@ -61,9 +61,16 @@
     const output = document.getElementById("output");
     const orb = document.getElementById("orb");
     let isListening = false;
+    let synth = window.speechSynthesis;
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "hi-IN"; // Hindi language
+      synth.speak(utter);
     }
 
     function getCustomReply(command) {
@@ -99,7 +106,7 @@
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = "en-US";
+      recognition.lang = "hi-IN"; // Hindi listening
 
       recognition.onstart = () => {
         statusText.textContent = "Listening...";
@@ -121,6 +128,7 @@
         statusText.textContent = "Processing...";
         await sleep(1000);
         output.textContent = `Doo-Tallks: ${reply}`;
+        speak(reply);
 
         isListening = false;
         await sleep(500);
@@ -147,7 +155,7 @@
       const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       wake.continuous = true;
       wake.interimResults = false;
-      wake.lang = "en-US";
+      wake.lang = "hi-IN";
 
       wake.onresult = (event) => {
         const phrase = event.results[0][0].transcript.toLowerCase();
