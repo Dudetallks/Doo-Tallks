@@ -1,178 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doo-Tallks</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #0a0f1c;
-      color: #00bcd4;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 2.8rem;
-      margin-bottom: 30px;
-      color: #2196f3;
-    }
-
-    .orb {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #00bcd4 40%, #006064);
-      box-shadow: 0 0 30px #00bcd4, 0 0 60px #00bcd4, 0 0 90px #00bcd4;
-      animation: pulse 2s infinite ease-in-out;
-      margin-bottom: 20px;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.6; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    #status, #output {
-      font-size: 1rem;
-      margin-top: 12px;
-      max-width: 90%;
-      color: #ffffffcc;
-    }
-  </style>
-</head>
-<body>
-  <h1>Doo-Tallks</h1>
-  <div id="orb" class="orb"></div>
-  <p id="status">Awaiting "Hey dude"...</p>
-  <p id="output"></p>
-
-  <script>
-    const statusText = document.getElementById("status");
-    const output = document.getElementById("output");
-    const orb = document.getElementById("orb");
-    let isListening = false;
-    let synth = window.speechSynthesis;
-
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    function speak(text) {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "hi-IN"; // Hindi language
-      synth.speak(utter);
-    }
-
-    function getCustomReply(command) {
-      if (command.includes("weather")) {
-        return "Today is beautiful with a slight chance of awesomeness.";
-      } else if (command.includes(" cute")) {
-        return "⚪ Like the moon, sir 🌝";
-      } else if (command.includes("what next i add to you")) {
-        return "Try adding voice reply or a Jarvis-style UI sir.";
-      } else if (command.includes("who are you")) {
-        return "I'm Doo-Tallks, your personal AI buddy!";
-      } else if (command.includes("what i makeing right now")) {
-        return "Animation called Types of youtuber be like. Want more info? 😎 let me know.";
-      } else if (command.includes("who am i")) {
-        return "You are God of Animation (in your dreams 😄)";
-      } else if (command.includes("who make you")) {
-        return "One intelligent guy named Aaftab 😎";
-      } else if (command.includes("what is my phone name")) {
-        return "Redmi K20 Pro (Same as iPhone 💥)";
-      } else if (command.includes("who is my best friend")) {
-        return "Me and Gisan Gori 😁";
-      } else if (command.includes("who is my best buddy")) {
-        return "Me always... oh I forgot, also Rose Sodha 💕";
-      } else {
-        return "Sorry, I don’t have an answer for that right now.";
-      }
-    }
-
-    function startListening() {
-      if (isListening) return;
-      isListening = true;
-
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = "hi-IN"; // Hindi listening
-
-      recognition.onstart = () => {
-        statusText.textContent = "Listening...";
-        orb.style.display = "block";
-      };
-
-      recognition.onresult = async (event) => {
-        const command = event.results[0][0].transcript.toLowerCase();
-        output.textContent = `Heard: "${command}"`;
-
-        if (command.includes("shutdown")) {
-          statusText.textContent = "Mic stopped.";
-          orb.style.display = "none";
-          isListening = false;
-          return;
+            responseEl.textContent = "Mujhe samajh nahi aaya. Phir se bolo?";
+        };
+        
+        // Run Command Function
+        function runCommand(command) {
+            let found = false;
+            
+            // Check for matching command
+            for (const key in commands) {
+                if (command.includes(key)) {
+                    responseEl.textContent = commands[key].response;
+                    if (commands[key].action) commands[key].action();
+                    found = true;
+                    break;
+                }
+            }
+            
+            // Default response if no command matched
+            if (!found) {
+                responseEl.textContent = `Maine suna: "${command}". Mujhe samajh nahi aaya. Kya aap dobara bol sakte hain?`;
+            }
+            
+            // Reset mic button
+            micBtn.classList.remove('bg-green-500');
+            micBtn.classList.add('bg-red-500');
+            statusEl.textContent = "Listen Karne Ke Liye Mic Button Ko Dabayein";
+            
+            // Speak the response
+            speak(responseEl.textContent);
         }
-
-        const reply = getCustomReply(command);
-        statusText.textContent = "Processing...";
-        await sleep(1000);
-        output.textContent = `Doo-Tallks: ${reply}`;
-        speak(reply);
-
-        isListening = false;
-        await sleep(500);
-        waitForHeyDude();
-      };
-
-      recognition.onerror = (e) => {
-        statusText.textContent = `Error: ${e.error}`;
-        isListening = false;
-        setTimeout(waitForHeyDude, 2000);
-      };
-
-      recognition.onend = () => {
-        isListening = false;
-        setTimeout(waitForHeyDude, 1000);
-      };
-
-      recognition.start();
-    }
-
-    function waitForHeyDude() {
-      if (isListening) return;
-
-      const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      wake.continuous = true;
-      wake.interimResults = false;
-      wake.lang = "hi-IN";
-
-      wake.onresult = (event) => {
-        const phrase = event.results[0][0].transcript.toLowerCase();
-        if (phrase.includes("hey dude")) {
-          wake.stop();
-          startListening();
+        
+        // Text-to-Speech Function
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'hi-IN'; // Hindi accent
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
         }
-      };
-
-      wake.onerror = () => {
-        setTimeout(waitForHeyDude, 2000);
-      };
-
-      wake.start();
-    }
-
-    waitForHeyDude();
-  </script>
+    </script>
 </body>
 </html>
