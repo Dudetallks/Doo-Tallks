@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -68,13 +69,16 @@
     const statusText = document.getElementById("status");
     const output = document.getElementById("output");
     const orb = document.getElementById("orb");
-    let isListening = true;
+    let isListening = false;
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     function startListening() {
+      if (isListening) return; // Prevent multiple listeners
+      isListening = true;
+
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.continuous = false;
       recognition.interimResults = false;
@@ -97,42 +101,41 @@
         }
 
         if (command.includes("open youtube")) {
-          window.location.href = "youtube://";
+          window.location.href = "https://www.youtube.com";
         } else if (command.includes("open instagram")) {
-          window.location.href = "instagram://";
+          window.location.href = "https://www.instagram.com";
         } else if (command.includes("open your enemy")) {
           window.open("https://chat.openai.com");
         } else if (command.includes("weather")) {
           window.open("https://www.google.com/search?q=weather+today");
         } else {
-          statusText.textContent = "Searching...";
+          statusText.textContent = "Searching on Google...";
           await sleep(1000);
           window.open(`https://www.google.com/search?q=${encodeURIComponent(command)}`);
         }
 
-        if (isListening) {
-          await sleep(1000);
-          startListening();
-        }
+        isListening = false;
+        await sleep(500);
+        waitForHeyDude();
       };
 
       recognition.onerror = (e) => {
         statusText.textContent = `Error: ${e.error}`;
-        if (isListening) {
-          setTimeout(startListening, 2000);
-        }
+        isListening = false;
+        setTimeout(waitForHeyDude, 2000);
       };
 
       recognition.onend = () => {
-        if (isListening) {
-          setTimeout(startListening, 1000);
-        }
+        isListening = false;
+        setTimeout(waitForHeyDude, 1000);
       };
 
       recognition.start();
     }
 
     function waitForHeyDude() {
+      if (isListening) return;
+
       const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       wake.continuous = true;
       wake.interimResults = false;
@@ -142,10 +145,174 @@
         const phrase = event.results[0][0].transcript.toLowerCase();
         if (phrase.includes("hey dude")) {
           wake.stop();
-          orb.style.display = "block";
-          isListening = true;
           startListening();
         }
+      };
+
+      wake.onerror = () => {
+        setTimeout(waitForHeyDude, 2000);
+      };
+
+      wake.start();
+    }
+
+    waitForHeyDude();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doo-Tallks</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0a0f1c;
+      color: #00bcd4;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 30px;
+      color: #2196f3;
+    }
+
+    .orb {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #00bcd4 40%, #006064);
+      box-shadow: 0 0 30px #00bcd4, 0 0 60px #00bcd4, 0 0 90px #00bcd4;
+      animation: pulse 2s infinite ease-in-out;
+      margin-bottom: 20px;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.6;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    #status, #output {
+      font-size: 1rem;
+      margin-top: 12px;
+      max-width: 90%;
+      color: #ffffffcc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Doo-Tallks</h1>
+  <div id="orb" class="orb"></div>
+  <p id="status">Awaiting "Hey dude"...</p>
+  <p id="output"></p>
+
+  <script>
+    const statusText = document.getElementById("status");
+    const output = document.getElementById("output");
+    const orb = document.getElementById("orb");
+    let isListening = false;
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function startListening() {
+      if (isListening) return; // Prevent multiple listeners
+      isListening = true;
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+
+      recognition.onstart = () => {
+        statusText.textContent = "Listening...";
+        orb.style.display = "block";
+      };
+
+      recognition.onresult = async (event) => {
+        const command = event.results[0][0].transcript.toLowerCase();
+        output.textContent = `Heard: "${command}"`;
+
+        if (command.includes("shutdown")) {
+          statusText.textContent = "Mic stopped.";
+          orb.style.display = "none";
+          isListening = false;
+          return;
+        }
+
+        if (command.includes("open youtube")) {
+          window.location.href = "https://www.youtube.com";
+        } else if (command.includes("open instagram")) {
+          window.location.href = "https://www.instagram.com";
+        } else if (command.includes("open your enemy")) {
+          window.open("https://chat.openai.com");
+        } else if (command.includes("weather")) {
+          window.open("https://www.google.com/search?q=weather+today");
+        } else {
+          statusText.textContent = "Searching on Google...";
+          await sleep(1000);
+          window.open(`https://www.google.com/search?q=${encodeURIComponent(command)}`);
+        }
+
+        isListening = false;
+        await sleep(500);
+        waitForHeyDude();
+      };
+
+      recognition.onerror = (e) => {
+        statusText.textContent = `Error: ${e.error}`;
+        isListening = false;
+        setTimeout(waitForHeyDude, 2000);
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        setTimeout(waitForHeyDude, 1000);
+      };
+
+      recognition.start();
+    }
+
+    function waitForHeyDude() {
+      if (isListening) return;
+
+      const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      wake.continuous = true;
+      wake.interimResults = false;
+      wake.lang = "en-US";
+
+      wake.onresult = (event) => {
+        const phrase = event.results[0][0].transcript.toLowerCase();
+        if (phrase.includes("hey dude")) {
+          wake.stop();
+          startListening();
+        }
+      };
+
+      wake.onerror = () => {
+        setTimeout(waitForHeyDude, 2000);
       };
 
       wake.start();
