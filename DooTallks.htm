@@ -59,6 +59,7 @@
   </style>
 </head>
 <body>
+  <h1>Doo-Tallks</h1>
   <div id="orb" class="orb"></div>
   <p id="status">Awaiting "Hey dude"...</p>
   <p id="output"></p>
@@ -73,8 +74,22 @@
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    function getCustomReply(command) {
+      if (command.includes("weather")) {
+        return "Today is beautiful with a slight chance of awesomeness.";
+      } else if (command.includes("how cute is my person beside me")) {
+        return "⚪ Like the moon, sir 🌝";
+      } else if (command.includes("what next i add to you")) {
+        return "Try adding voice reply or a Jarvis-style UI sir.";
+      } else if (command.includes("who are you")) {
+        return "I'm Doo-Tallks, your personal AI buddy!";
+      } else {
+        return "Sorry, I don’t have an answer for that right now.";
+      }
+    }
+
     function startListening() {
-      if (isListening) return; // Prevent multiple listeners
+      if (isListening) return;
       isListening = true;
 
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -98,19 +113,10 @@
           return;
         }
 
-        if (command.includes("open youtube")) {
-          window.location.href = "https://www.youtube.com";
-        } else if (command.includes("open instagram")) {
-          window.location.href = "https://www.instagram.com";
-        } else if (command.includes("open your enemy")) {
-          window.open("https://chat.openai.com");
-        } else if (command.includes("weather")) {
-          window.open("https://www.google.com/search?q=weather+today");
-        } else {
-          statusText.textContent = "Searching on Google...";
-          await sleep(1000);
-          window.open(`https://www.google.com/search?q=${encodeURIComponent(command)}`);
-        }
+        const reply = getCustomReply(command);
+        statusText.textContent = "Processing...";
+        await sleep(1000);
+        output.textContent = `Doo-Tallks: ${reply}`;
 
         isListening = false;
         await sleep(500);
