@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -9,48 +10,40 @@
       color: #00bcd4;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 80px;
     }
     h1 {
       font-size: 2.5rem;
+      color: #2196f3;
     }
-    .pulse {
-      width: 60px;
-      height: 60px;
-      background: #00bcd4;
+    #orb {
+      width: 100px;
+      height: 100px;
+      background-image: url('https://dudetallks.github.io/assets/orb.png'); /* Make sure this path is correct */
+      background-size: cover;
       border-radius: 50%;
-      margin: 30px auto;
-      animation: pulse 2s infinite;
+      margin: 20px auto;
+      animation: orbGlow 2s infinite linear;
     }
-    @keyframes pulse {
-      0% {
-        transform: scale(0.9);
-        opacity: 1;
-      }
-      70% {
-        transform: scale(1);
-        opacity: 0.4;
-      }
-      100% {
-        transform: scale(0.9);
-        opacity: 1;
-      }
+    @keyframes orbGlow {
+      0% { transform: rotate(0deg) scale(1); opacity: 1; }
+      50% { transform: rotate(180deg) scale(1.05); opacity: 0.8; }
+      100% { transform: rotate(360deg) scale(1); opacity: 1; }
     }
   </style>
 </head>
 <body>
   <h1>Doo-Tallks 🤖</h1>
-  <div id="pulse" class="pulse"></div>
+  <div id="orb"></div>
   <p id="status">Awaiting "Hey dude"...</p>
   <p id="output"></p>
 
   <script>
     const statusText = document.getElementById("status");
     const output = document.getElementById("output");
-    const pulse = document.getElementById("pulse");
+    const orb = document.getElementById("orb");
     let isListening = true;
-    let apiKey = "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"; // <-- Replace this with your actual OpenAI API Key
-
+    let apiKey = "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";
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -76,7 +69,7 @@
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "en-US";
-      
+
       recognition.onstart = () => statusText.textContent = "Listening...";
 
       recognition.onresult = async (event) => {
@@ -85,7 +78,7 @@
 
         if (command.includes("shutdown")) {
           statusText.textContent = "Mic stopped.";
-          pulse.style.display = "none";
+          orb.style.animation = "none";
           isListening = false;
           return;
         }
@@ -104,7 +97,7 @@
         } else {
           statusText.textContent = "Thinking...";
           const gptReply = await getGPTResponse(command);
-          await sleep(10000);
+          await sleep(10000); // 10 second gap
           output.textContent = `Doo-Tallks: ${gptReply}`;
         }
 
@@ -130,7 +123,6 @@
       recognition.start();
     }
 
-    // Activate on "Hey dude"
     function waitForHeyDude() {
       const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       wake.continuous = true;
@@ -151,60 +143,52 @@
     waitForHeyDude();
   </script>
 </body>
-</html>
-<!DOCTYPE html>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doo Tallks</title>
   <style>
     body {
       background-color: #0a0f1c;
       color: #00bcd4;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 80px;
     }
     h1 {
       font-size: 2.5rem;
+      color: #2196f3;
     }
-    .pulse {
-      width: 60px;
-      height: 60px;
-      background: #00bcd4;
+    #orb {
+      width: 100px;
+      height: 100px;
+      background-image: url('https://dudetallks.github.io/assets/orb.png'); /* Make sure this path is correct */
+      background-size: cover;
       border-radius: 50%;
-      margin: 30px auto;
-      animation: pulse 2s infinite;
+      margin: 20px auto;
+      animation: orbGlow 2s infinite linear;
     }
-    @keyframes pulse {
-      0% {
-        transform: scale(0.9);
-        opacity: 1;
-      }
-      70% {
-        transform: scale(1);
-        opacity: 0.4;
-      }
-      100% {
-        transform: scale(0.9);
-        opacity: 1;
-      }
+    @keyframes orbGlow {
+      0% { transform: rotate(0deg) scale(1); opacity: 1; }
+      50% { transform: rotate(180deg) scale(1.05); opacity: 0.8; }
+      100% { transform: rotate(360deg) scale(1); opacity: 1; }
     }
   </style>
 </head>
 <body>
   <h1>Doo-Tallks 🤖</h1>
-  <div id="pulse" class="pulse"></div>
+  <div id="orb"></div>
   <p id="status">Awaiting "Hey dude"...</p>
   <p id="output"></p>
 
   <script>
     const statusText = document.getElementById("status");
     const output = document.getElementById("output");
-    const pulse = document.getElementById("pulse");
+    const orb = document.getElementById("orb");
     let isListening = true;
-    let apiKey = "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"; // <-- Replace this with your actual OpenAI API Key
-
+    let apiKey = "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";
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -230,7 +214,7 @@
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "en-US";
-      
+
       recognition.onstart = () => statusText.textContent = "Listening...";
 
       recognition.onresult = async (event) => {
@@ -239,7 +223,7 @@
 
         if (command.includes("shutdown")) {
           statusText.textContent = "Mic stopped.";
-          pulse.style.display = "none";
+          orb.style.animation = "none";
           isListening = false;
           return;
         }
@@ -258,7 +242,7 @@
         } else {
           statusText.textContent = "Thinking...";
           const gptReply = await getGPTResponse(command);
-          await sleep(10000);
+          await sleep(10000); // 10 second gap
           output.textContent = `Doo-Tallks: ${gptReply}`;
         }
 
@@ -284,7 +268,6 @@
       recognition.start();
     }
 
-    // Activate on "Hey dude"
     function waitForHeyDude() {
       const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       wake.continuous = true;
@@ -305,8 +288,7 @@
     waitForHeyDude();
   </script>
 </body>
-</html>
-<!DOCTYPE html>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -318,48 +300,40 @@
       color: #00bcd4;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 80px;
     }
     h1 {
       font-size: 2.5rem;
+      color: #2196f3;
     }
-    .pulse {
-      width: 60px;
-      height: 60px;
-      background: #00bcd4;
+    #orb {
+      width: 100px;
+      height: 100px;
+      background-image: url('https://dudetallks.github.io/assets/orb.png'); /* Make sure this path is correct */
+      background-size: cover;
       border-radius: 50%;
-      margin: 30px auto;
-      animation: pulse 2s infinite;
+      margin: 20px auto;
+      animation: orbGlow 2s infinite linear;
     }
-    @keyframes pulse {
-      0% {
-        transform: scale(0.9);
-        opacity: 1;
-      }
-      70% {
-        transform: scale(1);
-        opacity: 0.4;
-      }
-      100% {
-        transform: scale(0.9);
-        opacity: 1;
-      }
+    @keyframes orbGlow {
+      0% { transform: rotate(0deg) scale(1); opacity: 1; }
+      50% { transform: rotate(180deg) scale(1.05); opacity: 0.8; }
+      100% { transform: rotate(360deg) scale(1); opacity: 1; }
     }
   </style>
 </head>
 <body>
   <h1>Doo-Tallks 🤖</h1>
-  <div id="pulse" class="pulse"></div>
+  <div id="orb"></div>
   <p id="status">Awaiting "Hey dude"...</p>
   <p id="output"></p>
 
   <script>
     const statusText = document.getElementById("status");
     const output = document.getElementById("output");
-    const pulse = document.getElementById("pulse");
+    const orb = document.getElementById("orb");
     let isListening = true;
-    let apiKey = "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"; // <-- Replace this with your actual OpenAI API Key
-
+    let apiKey = "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";
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -385,7 +359,7 @@
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "en-US";
-      
+
       recognition.onstart = () => statusText.textContent = "Listening...";
 
       recognition.onresult = async (event) => {
@@ -394,7 +368,7 @@
 
         if (command.includes("shutdown")) {
           statusText.textContent = "Mic stopped.";
-          pulse.style.display = "none";
+          orb.style.animation = "none";
           isListening = false;
           return;
         }
@@ -413,7 +387,7 @@
         } else {
           statusText.textContent = "Thinking...";
           const gptReply = await getGPTResponse(command);
-          await sleep(10000);
+          await sleep(10000); // 10 second gap
           output.textContent = `Doo-Tallks: ${gptReply}`;
         }
 
@@ -439,7 +413,6 @@
       recognition.start();
     }
 
-    // Activate on "Hey dude"
     function waitForHeyDude() {
       const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       wake.continuous = true;
@@ -460,8 +433,7 @@
     waitForHeyDude();
   </script>
 </body>
-</html>
-<!DOCTYPE html>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -473,48 +445,40 @@
       color: #00bcd4;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 80px;
     }
     h1 {
       font-size: 2.5rem;
+      color: #2196f3;
     }
-    .pulse {
-      width: 60px;
-      height: 60px;
-      background: #00bcd4;
+    #orb {
+      width: 100px;
+      height: 100px;
+      background-image: url('https://dudetallks.github.io/assets/orb.png'); /* Make sure this path is correct */
+      background-size: cover;
       border-radius: 50%;
-      margin: 30px auto;
-      animation: pulse 2s infinite;
+      margin: 20px auto;
+      animation: orbGlow 2s infinite linear;
     }
-    @keyframes pulse {
-      0% {
-        transform: scale(0.9);
-        opacity: 1;
-      }
-      70% {
-        transform: scale(1);
-        opacity: 0.4;
-      }
-      100% {
-        transform: scale(0.9);
-        opacity: 1;
-      }
+    @keyframes orbGlow {
+      0% { transform: rotate(0deg) scale(1); opacity: 1; }
+      50% { transform: rotate(180deg) scale(1.05); opacity: 0.8; }
+      100% { transform: rotate(360deg) scale(1); opacity: 1; }
     }
   </style>
 </head>
 <body>
   <h1>Doo-Tallks 🤖</h1>
-  <div id="pulse" class="pulse"></div>
+  <div id="orb"></div>
   <p id="status">Awaiting "Hey dude"...</p>
   <p id="output"></p>
 
   <script>
     const statusText = document.getElementById("status");
     const output = document.getElementById("output");
-    const pulse = document.getElementById("pulse");
+    const orb = document.getElementById("orb");
     let isListening = true;
-    let apiKey = "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"; // <-- Replace this with your actual OpenAI API Key
-
+    let apiKey = "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";
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -540,7 +504,7 @@
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "en-US";
-      
+
       recognition.onstart = () => statusText.textContent = "Listening...";
 
       recognition.onresult = async (event) => {
@@ -549,7 +513,7 @@
 
         if (command.includes("shutdown")) {
           statusText.textContent = "Mic stopped.";
-          pulse.style.display = "none";
+          orb.style.animation = "none";
           isListening = false;
           return;
         }
@@ -568,7 +532,7 @@
         } else {
           statusText.textContent = "Thinking...";
           const gptReply = await getGPTResponse(command);
-          await sleep(10000);
+          await sleep(10000); // 10 second gap
           output.textContent = `Doo-Tallks: ${gptReply}`;
         }
 
@@ -594,7 +558,6 @@
       recognition.start();
     }
 
-    // Activate on "Hey dude"
     function waitForHeyDude() {
       const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       wake.continuous = true;
