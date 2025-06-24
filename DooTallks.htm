@@ -1,178 +1,7 @@
-<html>
-<head>
-    <title>Doo Talks</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.7; }
-        }
-        @keyframes orb-float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0); }
-        }
-        .thinking-orb {
-            animation: 
-                pulse 2s infinite ease-in-out,
-                orb-float 3s infinite ease-in-out;
-            filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.8));
-        }
-    </style>
-</head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md relative">
-        <!-- Thinking Orb (hidden by default) -->
-        <div id="orb" class="thinking-orb hidden absolute -top-20 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-blue-500 rounded-full"></div>
-
-        <!-- Header -->
-        <div class="flex items-center gap-3 mb-6">
-            <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center">
-                <span class="text-xl">DT</span>
-            </div>
-            <div>
-                <h1 class="text-2xl font-bold">Doo Talks</h1>
-                <p class="text-blue-300">Kuch bhi poocho - main samjhoonga!</p>
-            </div>
-        </div>
-
-        <!-- Chat Area -->
-        <div id="chat" class="bg-gray-800 rounded-lg p-4 h-64 mb-4 overflow-y-auto">
-            <div class="chat-message ai mb-3 p-3 rounded-lg max-w-[80%] bg-gray-700">
-                <p>Hello i am Dude U can ask me anything </p>
-            </div>
-        </div>
-
-        <!-- Input Area -->
-        <div class="flex gap-2">
-            <input id="userInput" type="text" placeholder="Type your question..." 
-                   class="flex-1 bg-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
-                Send
-            </button>
-        </div>
-
-        <!-- Mic Button -->
-        <button id="micBtn" class="mt-4 mx-auto bg-red-600 hover:bg-red-700 rounded-full w-14 h-14 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-            </svg>
-        </button>
-    </div>
-
-    <script>
-        const chat = document.getElementById('chat');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const micBtn = document.getElementById('micBtn');
-        const orb = document.getElementById('orb');
-
-        // Add message to chat
-        function addMessage(text, isUser ) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `chat-message ${isUser  ? 'user' : 'ai'} mb-3 p-3 rounded-lg max-w-[80%] ${isUser  ? 'bg-blue-600 ml-auto' : 'bg-gray-700'}`;
-            msgDiv.innerHTML = `<p>${text}</p>`;
-            chat.appendChild(msgDiv);
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        // Show thinking animation
-        function showThinking() {
-            orb.classList.remove('hidden');
-        }
-
-        // Hide thinking animation
-        function hideThinking() {
-            orb.classList.add('hidden');
-        }
-
-        // Generate AI response
-        function getCustomReply(command) {
-            if (command.includes("weather")) {
-                return "Today is beautiful with a slight chance of awesomeness.";
-            } else if (command.includes("cute")) {
-                return " Like the moon, sir 🌝";
-            } else if (command.includes("what next i add to you")) {
-                return "Try adding voice reply or a Jarvis-style UI, sir.";
-            } else if (command.includes("who are you")) {
-                return "I'm Doo-Tallks, your personal AI buddy!";
-            } else if (command.includes("what i making right now")) {
-                return "Animation called 'Types of YouTubers be like'. Want more info? 😎 Let me know!";
-            } else if (command.includes("Who am I")) {
-                return "You are the God of Animator in your dream.";
-            } else if (command.includes("Who made you")) {
-                return "One intelligent guy named Aaftab 😎.";
-            } else if (command.includes("what is my phone name")) {
-                return "Redmi K20 Pro (Same as iPhone).";  
-            } else if (command.includes("Who is my best friend")) {
-                return "Me and Gisan Gori.";
-            } else if (command.includes("who is my best buddy")) {
-                return "Me always! Oh, I forgot Rose Sodha.";
-            } else {
-                return "Sorry, I don’t have an answer for that right now.";
-            }
-        }
-
-        // Text input handler
-        sendBtn.addEventListener('click', () => {
-            const question = userInput.value.trim();
-            if (question) {
-                addMessage(question, true);
-                userInput.value = '';
-                
-                showThinking(); // Show orb when processing
-                
-                setTimeout(() => {
-                    const response = getCustomReply(question);
-                    addMessage(response, false);
-                    hideThinking(); // Hide orb after response
-                }, 2000);
-            }
-        });
-
-        // Voice recognition handler
-        if ('webkitSpeechRecognition' in window) {
-            const recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-IN';
-            recognition.interimResults = false;
-            
-            micBtn.addEventListener('click', () => {
-                recognition.start();
-                micBtn.classList.add('bg-green-600');
-                micBtn.classList.remove('bg-red-600');
-                addMessage("Listening...", false);
-                showThinking(); // Show orb when listening
-            });
-
-            recognition.onresult = (e) => {
-                const question = e.results[0][0].transcript;
-                addMessage(question, true);
-                
-                setTimeout(() => {
-                    const response = getCustomReply(question);
-                    addMessage(response, false);
-                    hideThinking(); // Hide orb after response
-                    micBtn.classList.remove('bg-green-600');
-                    micBtn.classList.add('bg-red-600');
-                }, 2000);
-            };
-
-            recognition.onerror = () => {
-                micBtn.classList.remove('bg-green-600');
-                micBtn.classList.add('bg-red-600');
-                hideThinking(); // Hide orb on error
-            };
-        } else {
-            addMessage("Voice support not available in this browser", false);
-        }
-    </script>
-</body>
-</html>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Doo Talks - AI Assistant</title>
+    <title>Doo Talks - AI with Memory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes pulse {
@@ -195,7 +24,7 @@
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md relative">
-        <!-- Thinking Orb (hidden by default) -->
+        <!-- Thinking Orb -->
         <div id="orb" class="thinking-orb hidden absolute -top-20 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-blue-500 rounded-full"></div>
 
         <!-- Header -->
@@ -205,20 +34,21 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold">Doo Talks</h1>
-                <p class="text-blue-300">Kuch bhi poocho - main samjhoonga!</p>
+                <p class="text-blue-300">Meri memory hai - mujhse kuch bhi kehlo!</p>
             </div>
         </div>
 
         <!-- Chat Area -->
         <div id="chat" class="bg-gray-800 rounded-lg p-4 h-64 mb-4 overflow-y-auto">
             <div class="chat-message ai mb-3 p-3 rounded-lg max-w-[80%] bg-gray-700">
-                <p>Namaste! Main Doo Talks. Aap mujhse kuch bhi pooch sakte ho!</p>
+                <p>Namaste! Aap mujhe personal cheezein bata sakte ho, main yaad rakhunga.</p>
+                <p class="mt-2 text-sm text-blue-300">Jaise kehdo: "Mera birthday 15 August hai"</p>
             </div>
         </div>
 
         <!-- Input Area -->
         <div class="flex gap-2">
-            <input id="userInput" type="text" placeholder="Type your question..." 
+            <input id="userInput" type="text" placeholder="Type here..." 
                    class="flex-1 bg-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
                 Send
@@ -239,71 +69,126 @@
         const sendBtn = document.getElementById('sendBtn');
         const micBtn = document.getElementById('micBtn');
         const orb = document.getElementById('orb');
+        
+        // Memory Storage
+        let userMemory = {
+            birthday: null,
+            favoriteColor: null,
+            bestFriend: null,
+            // Add more memory slots as needed
+        };
 
         // Add message to chat
-        function addMessage(text, isUser ) {
+        function addMessage(text, isUser) {
             const msgDiv = document.createElement('div');
-            msgDiv.className = `chat-message ${isUser  ? 'user' : 'ai'} mb-3 p-3 rounded-lg max-w-[80%] ${isUser  ? 'bg-blue-600 ml-auto' : 'bg-gray-700'}`;
+            msgDiv.className = `chat-message ${isUser ? 'user' : 'ai'} mb-3 p-3 rounded-lg max-w-[80%] ${isUser ? 'bg-blue-600 ml-auto' : 'bg-gray-700'}`;
             msgDiv.innerHTML = `<p>${text}</p>`;
             chat.appendChild(msgDiv);
             chat.scrollTop = chat.scrollHeight;
         }
 
-        // Show thinking animation
-        function showThinking() {
-            orb.classList.remove('hidden');
-        }
+        // Show/hide thinking orb
+        function showThinking() { orb.classList.remove('hidden'); }
+        function hideThinking() { orb.classList.add('hidden'); }
 
-        // Hide thinking animation
-        function hideThinking() {
-            orb.classList.add('hidden');
+        // Extract and store personal information
+        function storeMemory(message) {
+            const lowerMsg = message.toLowerCase();
+            
+            // Check for birthday info
+            if (lowerMsg.includes("birthday") || lowerMsg.includes("janamdin")) {
+                const dateMatch = message.match(/\d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December)/i);
+                if (dateMatch) {
+                    userMemory.birthday = dateMatch[0];
+                    return `OK! Main yaad rakhunga aapka birthday ${userMemory.birthday} hai.`;
+                }
+            }
+            
+            // Check for favorite color
+            else if (lowerMsg.includes("favorite color") || lowerMsg.includes("pasandida rang")) {
+                const colorMatch = message.match(/(red|blue|green|yellow|pink|black|white|orange|purple)/i);
+                if (colorMatch) {
+                    userMemory.favoriteColor = colorMatch[0];
+                    return `Achha! Aapko ${userMemory.favoriteColor} rang pasand hai.`;
+                }
+            }
+            
+            // Check for best friend info
+            else if (lowerMsg.includes("best friend") || lowerMsg.includes("close dost")) {
+                const nameMatch = message.match(/(?:best friend|close dost)\s+(?:is|hai|ka naam)\s+([a-zA-Z]+)/i);
+                if (nameMatch && nameMatch[1]) {
+                    userMemory.bestFriend = nameMatch[1];
+                    return `Samajh gaya! ${userMemory.bestFriend} aapke best friend hain.`;
+                }
+            }
+            
+            return null; // No personal info found
         }
 
         // Generate AI response
-        function getCustomReply(command) {
-            if (command.includes("weather")) {
-                return "Today is beautiful with a slight chance of awesomeness.";
-            } else if (command.includes("cute")) {
-                return "⚪ Like the moon, sir 🌝";
-            } else if (command.includes("what next i add to you")) {
-                return "Try adding voice reply or a Jarvis-style UI, sir.";
-            } else if (command.includes("who are you")) {
-                return "I'm Doo-Tallks, your personal AI buddy!";
-            } else if (command.includes("what i making right now")) {
-                return "Animation called 'Types of YouTubers be like'. Want more info? 😎 Let me know!";
-            } else if (command.includes("Who am I")) {
-                return "You are the God of Animator in your dream.";
-            } else if (command.includes("Who made you")) {
-                return "One intelligent guy named Aaftab 😎.";
-            } else if (command.includes("what is my phone name")) {
-                return "Redmi K20 Pro (Same as iPhone).";  
-            } else if (command.includes("Who is my best friend")) {
-                return "Me and Gisan Gori.";
-            } else if (command.includes("who is my best buddy")) {
-                return "Me always! Oh, I forgot Rose Sodha.";
-            } else {
-                return "Sorry, I don’t have an answer for that right now.";
+        function getAIResponse(question) {
+            const lowerQuestion = question.toLowerCase();
+            
+            // Check memory recall questions
+            if (lowerQuestion.includes("my birthday") || lowerQuestion.includes("mera janamdin")) {
+                return userMemory.birthday ? 
+                    `Aapka birthday ${userMemory.birthday} hai.` : 
+                    "Mujhe aapka birthday yaad nahi. Aap bata sakte hain?";
+            }
+            else if (lowerQuestion.includes("favorite color") || lowerQuestion.includes("pasandida rang")) {
+                return userMemory.favoriteColor ?
+                    `Aapko ${userMemory.favoriteColor} rang pasand hai.` :
+                    "Mujhe aapka favorite color nahi pata. Aap bata sakte hain?";
+            }
+            else if (lowerQuestion.includes("best friend") || lowerQuestion.includes("close dost")) {
+                return userMemory.bestFriend ?
+                    `Aapke best friend ${userMemory.bestFriend} hain.` :
+                    "Mujhe aapke best friend ka naam nahi pata. Aap bata sakte hain?";
+            }
+            
+            // Try to store personal info first
+            const memoryResponse = storeMemory(question);
+            if (memoryResponse) return memoryResponse;
+            
+            // Default responses
+            const defaultResponses = [
+                "Samajh gaya! Main yaad rakhunga.",
+                "Theek hai, main ise note kar leta hoon.",
+                "Aapki baat meri memory mein save ho gayi hai."
+            ];
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+
+        // Speak with male voice
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'hi-IN';
+                utterance.rate = 0.9;
+                utterance.pitch = 0.85; // Deeper male voice
+                speechSynthesis.speak(utterance);
             }
         }
 
         // Text input handler
         sendBtn.addEventListener('click', () => {
-            const question = userInput.value.trim();
-            if (question) {
-                addMessage(question, true);
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage(message, true);
                 userInput.value = '';
                 
-                showThinking(); // Show orb when processing
+                showThinking();
                 
                 setTimeout(() => {
-                    const response = getCustomReply(question);
+                    const response = getAIResponse(message);
                     addMessage(response, false);
-                    hideThinking(); // Hide orb after response
-                }, 2000);
+                    speak(response);
+                    hideThinking();
+                }, 1200);
             }
         });
 
-        // Voice recognition handler
+        // Voice recognition
         if ('webkitSpeechRecognition' in window) {
             const recognition = new webkitSpeechRecognition();
             recognition.lang = 'en-IN';
@@ -314,30 +199,44 @@
                 micBtn.classList.add('bg-green-600');
                 micBtn.classList.remove('bg-red-600');
                 addMessage("Listening...", false);
-                showThinking(); // Show orb when listening
+                showThinking();
             });
 
             recognition.onresult = (e) => {
-                const question = e.results[0][0].transcript;
-                addMessage(question, true);
+                const message = e.results[0][0].transcript;
+                addMessage(message, true);
                 
                 setTimeout(() => {
-                    const response = getCustomReply(question);
+                    const response = getAIResponse(message);
                     addMessage(response, false);
-                    hideThinking(); // Hide orb after response
+                    speak(response);
+                    hideThinking();
                     micBtn.classList.remove('bg-green-600');
                     micBtn.classList.add('bg-red-600');
-                }, 2000);
+                }, 1200);
             };
 
             recognition.onerror = () => {
                 micBtn.classList.remove('bg-green-600');
                 micBtn.classList.add('bg-red-600');
-                hideThinking(); // Hide orb on error
+                hideThinking();
             };
         } else {
-            addMessage("Voice support not available in this browser", false);
+            addMessage("Voice support not available - please use Chrome", false);
         }
+
+        // Load male voice if available
+        speechSynthesis.onvoiceschanged = function() {
+            const voices = speechSynthesis.getVoices();
+            // Try to find a male voice (Chrome on Windows/Mac)
+            const maleVoice = voices.find(voice => 
+                voice.name.includes('Male') || 
+                voice.lang.includes('en-IN')
+            );
+            if (maleVoice) {
+                console.log("Male voice loaded:", maleVoice.name);
+            }
+        };
     </script>
 </body>
 </html>
