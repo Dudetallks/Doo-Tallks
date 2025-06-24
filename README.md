@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -37,18 +36,9 @@
     }
 
     @keyframes pulse {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.1);
-        opacity: 0.6;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.6; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
     #status, #output {
@@ -84,22 +74,22 @@
         return "Try adding voice reply or a Jarvis-style UI sir.";
       } else if (command.includes("who are you")) {
         return "I'm Doo-Tallks, your personal AI buddy!";
+      } else if (command.includes("what i makeing right now")) {
+        return "Animation called Types of youtuber be like. Want more info? 😎 let me know.";
+      } else if (command.includes("who am i")) {
+        return "You are God of Animation (in your dreams 😄)";
+      } else if (command.includes("who make you")) {
+        return "One intelligent guy named Aaftab 😎";
+      } else if (command.includes("what is my phone name")) {
+        return "Redmi K20 Pro (Same as iPhone 💥)";
+      } else if (command.includes("who is my best friend")) {
+        return "Me and Gisan Gori 😁";
+      } else if (command.includes("who is my best buddy")) {
+        return "Me always... oh I forgot, also Rose Sodha 💕";
       } else {
         return "Sorry, I don’t have an answer for that right now.";
-      } else if (command.includes("what i makeing right now")) {
-        return "Animation called Types of youtuber be like Want more info😎 let me know";
-      } else if (command.includes("Who Im I")) {
-        return "U are God of Animator in your dream";
-      } else if (command.includes("Who make you")) {
-        return "One intelligent Guy Name Aaftab😎";
-      } else if (command.includes("what is my phone name")) {
-        return "Redmi K20 pro (Same as Iphone)";  
-      } else if (command.includes("Who is my best Friend")) {
-        return "Me and Gisan Gori";
-      } else if (command.includes("who is my Best Buddy")) {
-        return "Me always Oh i forgot Rose Sodha";
+      }
     }
-
 
     function startListening() {
       if (isListening) return;
