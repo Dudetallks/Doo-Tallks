@@ -1,65 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Doo Tallks</title>
   <style>
     body {
-      background: #0f172a;
+      background-color: #0f172a;
       color: #f1f5f9;
       font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 20px;
       text-align: center;
+      padding: 40px;
     }
     h1 {
-      font-size: 3rem;
+      font-size: 2.5rem;
       color: #38bdf8;
     }
-    p {
+    #output {
+      margin-top: 20px;
       font-size: 1.2rem;
       color: #94a3b8;
+    }
+    .pulse-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
       margin-top: 20px;
-    }
-    .loader {
-      border: 4px solid #1e293b;
-      border-top: 4px solid #38bdf8;
-      border-radius: 50%;
-      width: 40px;
       height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
+    }
+    .pulse-bar {
+      width: 6px;
+      height: 20px;
+      background: #38bdf8;
+      animation: pulse 1s infinite ease-in-out;
+    }
+    .pulse-bar:nth-child(1) { animation-delay: 0s; }
+    .pulse-bar:nth-child(2) { animation-delay: 0.2s; }
+    .pulse-bar:nth-child(3) { animation-delay: 0.4s; }
+    .pulse-bar:nth-child(4) { animation-delay: 0.6s; }
+    .pulse-bar:nth-child(5) { animation-delay: 0.8s; }
+
+    @keyframes pulse {
+      0%, 100% { height: 10px; }
+      50% { height: 30px; }
+    }
+
+    .hidden {
       display: none;
-    }
-    .show {
-      display: block;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
-  <h1>Doo Tallks 🤖</h1>
-  <div class="loader" id="loader"></div>
+  <h1>Doo Tallks</h1>
+  <div class="pulse-container hidden" id="pulse">
+    <div class="pulse-bar"></div>
+    <div class="pulse-bar"></div>
+    <div class="pulse-bar"></div>
+    <div class="pulse-bar"></div>
+    <div class="pulse-bar"></div>
+  </div>
   <p id="output">Say "Hey dude" to start...</p>
 
   <script>
     const output = document.getElementById("output");
-    const loader = document.getElementById("loader");
+    const pulse = document.getElementById("pulse");
 
-    function showLoader(text) {
-      loader.classList.add("show");
+    function showPulse(text) {
+      pulse.classList.remove("hidden");
       output.textContent = text;
     }
 
-    function hideLoader() {
-      loader.classList.remove("show");
+    function hidePulse() {
+      pulse.classList.add("hidden");
     }
 
     function startWakeWordListener() {
@@ -68,26 +80,27 @@
       wakeRecognition.interimResults = false;
 
       wakeRecognition.onstart = () => {
-        showLoader("🎧 Listening for 'Hey dude'...");
+        showPulse("🎧 Listening for 'Hey dude'...");
       };
 
       wakeRecognition.onresult = (event) => {
-        hideLoader();
+        hidePulse();
         const transcript = event.results[0][0].transcript.toLowerCase();
         output.textContent = `You said: "${transcript}"`;
+
         if (transcript.includes("hey dude")) {
           output.textContent = "Doo Tallks activated! 🎉 Listening for commands...";
-          startCommandListener();
+          setTimeout(() => startCommandListener(), 1000);
         } else {
           output.textContent = "Say 'Hey dude' to activate.";
-          startWakeWordListener(); // Keep listening
+          setTimeout(() => startWakeWordListener(), 1000);
         }
       };
 
       wakeRecognition.onerror = () => {
-        hideLoader();
+        hidePulse();
         output.textContent = "Mic error. Retrying...";
-        startWakeWordListener(); // Retry on error
+        setTimeout(() => startWakeWordListener(), 1000);
       };
 
       wakeRecognition.start();
@@ -99,18 +112,24 @@
       commandRecognition.interimResults = false;
 
       commandRecognition.onstart = () => {
-        showLoader("🎤 Listening for command...");
+        showPulse("🎤 Listening for command...");
       };
 
       commandRecognition.onresult = (event) => {
-        hideLoader();
+        hidePulse();
         const command = event.results[0][0].transcript.toLowerCase();
         output.textContent = `Command: "${command}"`;
 
+        if (command.includes("shutdown")) {
+          output.textContent = "Doo Tallks shut down. Say 'Hey dude' to reactivate.";
+          setTimeout(() => startWakeWordListener(), 2000);
+          return;
+        }
+
         if (command.includes("youtube")) {
-          window.open("https://youtube.com", "_blank");
+          window.location.href = "vnd.youtube://";
         } else if (command.includes("instagram")) {
-          window.open("https://instagram.com", "_blank");
+          window.location.href = "intent://instagram.com/#Intent;package=com.instagram.android;scheme=https;end";
         } else if (command.includes("chrome")) {
           output.textContent = "Bhai tu toh already Chrome pe hai! 😂";
         } else if (command.includes("time")) {
@@ -136,12 +155,12 @@
           output.textContent = "Command not recognized.";
         }
 
-        // Continue listening
-        setTimeout(() => startCommandListener(), 1000);
+        // Delay of 10 seconds before listening again
+        setTimeout(() => startCommandListener(), 10000);
       };
 
       commandRecognition.onerror = () => {
-        hideLoader();
+        hidePulse();
         output.textContent = "Mic error. Restarting command mode...";
         setTimeout(() => startCommandListener(), 1000);
       };
@@ -149,7 +168,7 @@
       commandRecognition.start();
     }
 
-    // Start listening immediately on page load
+    // Auto start wake word on page load
     window.onload = () => {
       startWakeWordListener();
     };
