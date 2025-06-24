@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -60,7 +59,6 @@
   </style>
 </head>
 <body>
-  <h1>Doo-Tallks</h1>
   <div id="orb" class="orb"></div>
   <p id="status">Awaiting "Hey dude"...</p>
   <p id="output"></p>
@@ -69,13 +67,16 @@
     const statusText = document.getElementById("status");
     const output = document.getElementById("output");
     const orb = document.getElementById("orb");
-    let isListening = true;
+    let isListening = false;
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     function startListening() {
+      if (isListening) return; // Prevent multiple listeners
+      isListening = true;
+
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.continuous = false;
       recognition.interimResults = false;
@@ -98,42 +99,41 @@
         }
 
         if (command.includes("open youtube")) {
-          window.location.href = "youtube://";
+          window.location.href = "https://www.youtube.com";
         } else if (command.includes("open instagram")) {
-          window.location.href = "instagram://";
+          window.location.href = "https://www.instagram.com";
         } else if (command.includes("open your enemy")) {
           window.open("https://chat.openai.com");
         } else if (command.includes("weather")) {
           window.open("https://www.google.com/search?q=weather+today");
         } else {
-          statusText.textContent = "Searching...";
+          statusText.textContent = "Searching on Google...";
           await sleep(1000);
           window.open(`https://www.google.com/search?q=${encodeURIComponent(command)}`);
         }
 
-        if (isListening) {
-          await sleep(1000);
-          startListening();
-        }
+        isListening = false;
+        await sleep(500);
+        waitForHeyDude();
       };
 
       recognition.onerror = (e) => {
         statusText.textContent = `Error: ${e.error}`;
-        if (isListening) {
-          setTimeout(startListening, 2000);
-        }
+        isListening = false;
+        setTimeout(waitForHeyDude, 2000);
       };
 
       recognition.onend = () => {
-        if (isListening) {
-          setTimeout(startListening, 1000);
-        }
+        isListening = false;
+        setTimeout(waitForHeyDude, 1000);
       };
 
       recognition.start();
     }
 
     function waitForHeyDude() {
+      if (isListening) return;
+
       const wake = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       wake.continuous = true;
       wake.interimResults = false;
@@ -143,10 +143,12 @@
         const phrase = event.results[0][0].transcript.toLowerCase();
         if (phrase.includes("hey dude")) {
           wake.stop();
-          orb.style.display = "block";
-          isListening = true;
           startListening();
         }
+      };
+
+      wake.onerror = () => {
+        setTimeout(waitForHeyDude, 2000);
       };
 
       wake.start();
