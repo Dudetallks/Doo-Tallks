@@ -1,242 +1,346 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Doo Talks - AI with Memory</title>
+    <title>Doo Talks - AI Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        
+        body {
+            background: linear-gradient(rgba(0,0,0,0.9), rgba(10,5,30,0.9)), 
+                        url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=1470&auto=format&fit=crop');
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .ai-logo {
+            animation: pulse 2s infinite, float 3s infinite;
+            background: radial-gradient(circle, #3b82f6, #1e40af);
+            box-shadow: 0 0 30px #3b82f680;
+        }
+        
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.7; }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
-        @keyframes orb-float {
-            0% { transform: translateY(0); }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
-            100% { transform: translateY(0); }
         }
-        .thinking-orb {
-            animation: 
-                pulse 2s infinite ease-in-out,
-                orb-float 3s infinite ease-in-out;
-            filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.8));
+        
+        .chat-bubble-ai {
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 18px 18px 18px 4px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .chat-bubble-user {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 18px 18px 4px 18px;
+        }
+        
+        .mic-btn {
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+            transition: all 0.3s;
+        }
+        
+        .mic-btn.listening {
+            animation: pulse 0.8s infinite;
+            box-shadow: 0 0 0 5px rgba(236, 72, 153, 0.3);
+        }
+        
+        .typing-indicator span {
+            animation: bounce 1.4s infinite ease-in-out;
+            background: #8b5cf6;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+        }
+        
+        .command-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 12px;
+            margin: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .command-btn:hover {
+            background: rgba(255,255,255,0.2);
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md relative">
-        <!-- Thinking Orb -->
-        <div id="orb" class="thinking-orb hidden absolute -top-20 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-blue-500 rounded-full"></div>
-
-        <!-- Header -->
-        <div class="flex items-center gap-3 mb-6">
-            <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center">
-                <span class="text-xl">DT</span>
-            </div>
-            <div>
-                <h1 class="text-2xl font-bold">Doo Talks</h1>
-                <p class="text-blue-300">Meri memory hai - mujhse kuch bhi kehlo!</p>
-            </div>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Logo -->
+        <div class="ai-logo w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                <path d="M3.27 6.96 12 12.01l8.73-5.05"></path>
+                <path d="M12 22.08V12"></path>
+            </svg>
         </div>
-
+        
+        <!-- Title -->
+        <h1 class="text-3xl font-bold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+            Doo Talks
+        </h1>
+        <p class="text-blue-200 text-center mb-6">Your Hinglish Animation Expert Assistant</p>
+        
+        <!-- Quick Commands -->
+        <div class="flex flex-wrap justify-center gap-1 mb-4">
+            <button class="command-btn" onclick="handleCommand('youtube')">Open YouTube</button>
+            <button class="command-btn" onclick="handleCommand('instagram')">Open Instagram</button>
+            <button class="command-btn" onclick="handleCommand('chatgpt')">Open ChatGPT</button>
+            <button class="command-btn" onclick="handleCommand('animation tips')">Animation Tips</button>
+            <button class="command-btn" onclick="handleCommand('about me')">About Aaftab</button>
+        </div>
+        
         <!-- Chat Area -->
-        <div id="chat" class="bg-gray-800 rounded-lg p-4 h-64 mb-4 overflow-y-auto">
-            <div class="chat-message ai mb-3 p-3 rounded-lg max-w-[80%] bg-gray-700">
-                <p>Namaste! Aap mujhe personal cheezein bata sakte ho, main yaad rakhunga.</p>
-                <p class="mt-2 text-sm text-blue-300">Jaise kehdo: "Mera birthday 15 August hai"</p>
+        <div id="chat" class="bg-black bg-opacity-40 rounded-2xl p-4 h-80 mb-4 overflow-y-auto">
+            <div class="chat-bubble-ai mb-3 p-4 max-w-[80%]">
+                <p>Namaste bhaiyo! Main Doo Talks hoon - Aaftab Sodha ka personal AI assistant!</p>
+                <p class="mt-2 text-blue-200 text-sm">Mujhse Hinglish mein baat karo, YouTube/Instagram kholo, ya animation ke bare mein pucho!</p>
             </div>
         </div>
-
+        
         <!-- Input Area -->
-        <div class="flex gap-2">
-            <input id="userInput" type="text" placeholder="Type here..." 
-                   class="flex-1 bg-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
+        <div class="flex gap-2 mb-4">
+            <input id="userInput" type="text" placeholder="Type your message..." 
+                   class="flex-1 bg-gray-800 bg-opacity-70 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl text-white">
                 Send
             </button>
         </div>
-
+        
         <!-- Mic Button -->
-        <button id="micBtn" class="mt-4 mx-auto bg-red-600 hover:bg-red-700 rounded-full w-14 h-14 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-            </svg>
-        </button>
+        <div class="flex justify-center">
+            <button id="micBtn" class="mic-btn rounded-full w-14 h-14 flex items-center justify-center text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <script>
+        // DOM Elements
         const chat = document.getElementById('chat');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
         const micBtn = document.getElementById('micBtn');
-        const orb = document.getElementById('orb');
         
-        // Memory Storage
-        let userMemory = {
-            birthday: null,
-            favoriteColor: null,
-            bestFriend: null,
-            // Add more memory slots as needed
+        // Personal Information
+        const personalInfo = {
+            name: "Aaftab Sodha",
+            youtubeName: "DudeTallks (Main Channel)",
+            secondChannel: "DudeFrameZ",
+            aiProject: "Doo Tallks AI (Apne aap banaya hai!)",
+            family: {
+                dad: "Iqbal Sodha",
+                mom: "Najma Sodha",
+                sister: "Rose Sodha",
+                friend: "Gisan Gori (Bhai full support system 😎🔥)"
+            },
+            youtubeContent: {
+                mainChannel: "DudeTallks",
+                secondChannel: "DudeFrameZ (Gaming + challenge based)",
+                audienceName: "Dudeverse Army 🔥"
+            },
+            animationTools: [
+                "Adobe Animate (with mouse)",
+                "CapCut/Canva for thumbnails",
+                "Doo Tallks AI (Apna khud ka AI bana liya bro OP 🤯🔥)"
+            ],
+            currentProjects: [
+                "Types of YouTubers Be Like (Main project, Laalu ka voice pending)",
+                "First Love – Part 1 Remaster",
+                "Stone Age Series Trailer ("Cigarette ne bacha li meri jaan" wala 😂)",
+                "YouTube Be Like (Funny medical help on YouTube)",
+                "YOUTUBE Ads Be Like ☠️🔥 (Ad parody)",
+                "Ayman Job Interview (With RG cameo)"
+            ],
+            routine: [
+                "Namaaz included ✅",
+                "Animation + gaming + YouTube + study balance",
+                "Hardworking, focused, and always learning"
+            ],
+            goals: [
+                "Apna animation style banana",
+                "RG-level animation achieve karna (mouse se bhi!)",
+                "Apna AI project improve karna (Doo Talks AI 🔥)",
+                "Dono channel grow karna"
+            ],
+            dialogueVibe: [
+                "Mai woh banda hu jo chhota hai par sapne bade hai!",
+                "Competition se darr nahi lagta... bina competition ke zindagi boring hai!"
+            ]
         };
-
+        
+        // Animation Knowledge
+        const animationKnowledge = {
+            basics: [
+                "Animation ka basic rule - Squash & Stretch. Objects ko realistic movement dena hai toh yeh zaroori hai.",
+                "12 Principles of Animation padho - Disney ke animators ne banaya tha, sabse important cheez!"
+            ],
+            tools: [
+                "Adobe Animate best hai 2D animation ke liye, with mouse bhi kaam chal jata hai!",
+                "CapCut achha hai basic video editing ke liye, Canva thumbnails ke liye mast hai",
+                "Screen recorder (OBS) use karo reference videos ke liye - apne expressions record karke dekhlo!"
+            ],
+            tips: [
+                "Start small - 10-15 second ki short animations banao pehle",
+                "Reference videos dekho - real life movements samajhne ke liye",
+                "Frame rate matter karta hai - 24fps smooth animation ke liye best hai",
+                "Key frames pe focus karo - in-between frames baad mein bhar dena",
+                "Sound effects aur background music animation ko zyada effective banata hai"
+            ],
+            workflow: [
+                "Pehle storyboard banao - animation se pehle plan karlo",
+                "Rough sketches karo - perfection ki tension mat lo",
+                "Voice recording pehle karlo - animation baad mein sync karna easier hota hai",
+                "Lip sync ke liye phoneme chart use karo - mouth positions ka reference"
+            ],
+            motivation: [
+                "Roz thoda time nikalna - consistency matters more than long sessions!",
+                "Mouse se animation mein practice karo - agar tablet nahi hai toh bhi ho sakta hai",
+                "Shortcuts seekho software ke - time bachta hai",
+                "Apna style develop karo - copy mat karo, inspire ho!"
+            ]
+        };
+        
+        // Command Knowledge
+        const commandKnowledge = {
+            youtube: {
+                response: "Opening YouTube... DudeTallks channel khul raha hai! 🔥",
+                action: () => window.open('https://www.youtube.com/@DudeTallks', '_blank')
+            },
+            instagram: {
+                response: "Opening Instagram... check karo latest posts! 📸",
+                action: () => window.open('https://www.instagram.com', '_blank')
+            },
+            chatgpt: {
+                response: "Opening ChatGPT... AI assistant ki madad le lo! 🤖",
+                action: () => window.open('https://chat.openai.com', '_blank')
+            }
+        };
+        
+        // Hinglish Responses
+        const hingeKnowledge = {
+            greeting: [
+                "Namaste ji! Kaise ho aaj?", 
+                "Hello hello! Doo Talks at your service. Bolo kya chahiye?", 
+                "Haan ji batao, kaise madad karun?"
+            ],
+            howAreYou: [
+                "Main bilkul mast hoon! Aap sunao?", 
+                "Sab badhiya chal raha hai. Aapka din kaisa chal raha hai?", 
+                "Ekdum fresh feeling hai aaj toh!"
+            ],
+            weather: [
+                "Aaj toh bahar mausam ekdum jam ke hai! Thanda-thanda cool cool...",
+                "Mere hisab se aaj umbrella leke jana, baarish ho sakti hai", 
+                "Garmi bahut hai bhai! AC mein rehna better hoga aaj"
+            ],
+            time: [
+                `Abhi time hai ${new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'})} baje`,
+                "Meri clock ke according toh time pass ho raha hai... just kidding! Time check karna hai?",
+                "Samay toh nikal hi raha hai, par abhi bhi ${new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'})} baje hain"
+            ],
+            joke: [
+                "Ek doctor ne patient se kaha: 'Aapko har din 10km walk karna chahiye'... patient bola: 'Doctor sahab, main toh Zomato pe hi order karta hoon!'",
+                "Ek chotu ne apni teacher se pucha: 'Madam, humare liye homework ko easy bana dijiye na?' Teacher boli: 'Toh mein kya karun, tumhare liye life easy banwa dun?'",
+                "Dost ne pucha: 'Yaar teri biwi kitni smart hai?' Maine kaha: 'Itni smart hai ki mujh jaise ko shaadi kar li!'",
+                "Ek uncle roz subah 5 baje uth ke walk pe jaate the. Din bhar soye rehte the, bas subah walk karne chale jaate the"
+            ],
+            default: [
+                "Sorry ji, samajh nahi aaya. Thoda clear batao na?",
+                "Arre yeh toh mujhe maloom nahi. Kuch aur pucho na!",
+                "Abhi meri Hinglish thodi weak hai. Thoda simple bolo na bhai!"
+            ]
+        };
+        
         // Add message to chat
         function addMessage(text, isUser) {
             const msgDiv = document.createElement('div');
-            msgDiv.className = `chat-message ${isUser ? 'user' : 'ai'} mb-3 p-3 rounded-lg max-w-[80%] ${isUser ? 'bg-blue-600 ml-auto' : 'bg-gray-700'}`;
+            msgDiv.className = `${isUser ? 'chat-bubble-user ml-auto' : 'chat-bubble-ai'} mb-3 p-4 max-w-[80%]`;
             msgDiv.innerHTML = `<p>${text}</p>`;
             chat.appendChild(msgDiv);
             chat.scrollTop = chat.scrollHeight;
         }
-
-        // Show/hide thinking orb
-        function showThinking() { orb.classList.remove('hidden'); }
-        function hideThinking() { orb.classList.add('hidden'); }
-
-        // Extract and store personal information
-        function storeMemory(message) {
-            const lowerMsg = message.toLowerCase();
-            
-            // Check for birthday info
-            if (lowerMsg.includes("birthday") || lowerMsg.includes("janamdin")) {
-                const dateMatch = message.match(/\d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December)/i);
-                if (dateMatch) {
-                    userMemory.birthday = dateMatch[0];
-                    return `OK! Main yaad rakhunga aapka birthday ${userMemory.birthday} hai.`;
-                }
-            }
-            
-            // Check for favorite color
-            else if (lowerMsg.includes("favorite color") || lowerMsg.includes("pasandida rang")) {
-                const colorMatch = message.match(/(red|blue|green|yellow|pink|black|white|orange|purple)/i);
-                if (colorMatch) {
-                    userMemory.favoriteColor = colorMatch[0];
-                    return `Achha! Aapko ${userMemory.favoriteColor} rang pasand hai.`;
-                }
-            }
-            
-            // Check for best friend info
-            else if (lowerMsg.includes("best friend") || lowerMsg.includes("close dost")) {
-                const nameMatch = message.match(/(?:best friend|close dost)\s+(?:is|hai|ka naam)\s+([a-zA-Z]+)/i);
-                if (nameMatch && nameMatch[1]) {
-                    userMemory.bestFriend = nameMatch[1];
-                    return `Samajh gaya! ${userMemory.bestFriend} aapke best friend hain.`;
-                }
-            }
-            
-            return null; // No personal info found
+        
+        // Show typing indicator
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-bubble-ai mb-3 p-3 max-w-[40%]';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator flex items-center">
+                    <span class="w-2 h-2 rounded-full mx-1"></span>
+                    <span class="w-2 h-2 rounded-full mx-1"></span>
+                    <span class="w-2 h-2 rounded-full mx-1"></span>
+                </div>
+            `;
+            chat.appendChild(typingDiv);
+            chat.scrollTop = chat.scrollHeight;
         }
-
-        // Generate AI response
-        function getAIResponse(question) {
-            const lowerQuestion = question.toLowerCase();
-            
-            // Check memory recall questions
-            if (lowerQuestion.includes("my birthday") || lowerQuestion.includes("mera janamdin")) {
-                return userMemory.birthday ? 
-                    `Aapka birthday ${userMemory.birthday} hai.` : 
-                    "Mujhe aapka birthday yaad nahi. Aap bata sakte hain?";
-            }
-            else if (lowerQuestion.includes("favorite color") || lowerQuestion.includes("pasandida rang")) {
-                return userMemory.favoriteColor ?
-                    `Aapko ${userMemory.favoriteColor} rang pasand hai.` :
-                    "Mujhe aapka favorite color nahi pata. Aap bata sakte hain?";
-            }
-            else if (lowerQuestion.includes("best friend") || lowerQuestion.includes("close dost")) {
-                return userMemory.bestFriend ?
-                    `Aapke best friend ${userMemory.bestFriend} hain.` :
-                    "Mujhe aapke best friend ka naam nahi pata. Aap bata sakte hain?";
-            }
-            
-            // Try to store personal info first
-            const memoryResponse = storeMemory(question);
-            if (memoryResponse) return memoryResponse;
-            
-            // Default responses
-            const defaultResponses = [
-                "Samajh gaya! Main yaad rakhunga.",
-                "Theek hai, main ise note kar leta hoon.",
-                "Aapki baat meri memory mein save ho gayi hai."
-            ];
-            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        
+        // Hide typing indicator
+        function hideTyping() {
+            const typingDiv = document.getElementById('typingIndicator');
+            if (typingDiv) typingDiv.remove();
         }
-
-        // Speak with male voice
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'hi-IN';
-                utterance.rate = 0.9;
-                utterance.pitch = 0.85; // Deeper male voice
-                speechSynthesis.speak(utterance);
-            }
+        
+        // Handle commands from buttons
+        function handleCommand(cmd) {
+            userInput.value = cmd;
+            sendBtn.click();
         }
-
-        // Text input handler
-        sendBtn.addEventListener('click', () => {
-            const message = userInput.value.trim();
-            if (message) {
-                addMessage(message, true);
-                userInput.value = '';
-                
-                showThinking();
-                
-                setTimeout(() => {
-                    const response = getAIResponse(message);
-                    addMessage(response, false);
-                    speak(response);
-                    hideThinking();
-                }, 1200);
-            }
-        });
-
-        // Voice recognition
-        if ('webkitSpeechRecognition' in window) {
-            const recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-IN';
-            recognition.interimResults = false;
+        
+        // Get AI response
+        function getAIResponse(input) {
+            const lowerInput = input.toLowerCase();
             
-            micBtn.addEventListener('click', () => {
-                recognition.start();
-                micBtn.classList.add('bg-green-600');
-                micBtn.classList.remove('bg-red-600');
-                addMessage("Listening...", false);
-                showThinking();
-            });
-
-            recognition.onresult = (e) => {
-                const message = e.results[0][0].transcript;
-                addMessage(message, true);
-                
-                setTimeout(() => {
-                    const response = getAIResponse(message);
-                    addMessage(response, false);
-                    speak(response);
-                    hideThinking();
-                    micBtn.classList.remove('bg-green-600');
-                    micBtn.classList.add('bg-red-600');
-                }, 1200);
-            };
-
-            recognition.onerror = () => {
-                micBtn.classList.remove('bg-green-600');
-                micBtn.classList.add('bg-red-600');
-                hideThinking();
-            };
-        } else {
-            addMessage("Voice support not available - please use Chrome", false);
-        }
-
-        // Load male voice if available
-        speechSynthesis.onvoiceschanged = function() {
-            const voices = speechSynthesis.getVoices();
-            // Try to find a male voice (Chrome on Windows/Mac)
-            const maleVoice = voices.find(voice => 
-                voice.name.includes('Male') || 
-                voice.lang.includes('en-IN')
-            );
-            if (maleVoice) {
-                console.log("Male voice loaded:", maleVoice.name);
+            // Check commands first
+            if (/youtube|dudetalks|video/.test(lowerInput)) {
+                commandKnowledge.youtube.action();
+                return commandKnowledge.youtube.response;
             }
-        };
-    </script>
-</body>
-</html>
+            else if (/instagram|insta|photo/.test(lowerInput)) {
+                commandKnowledge.instagram.action();
+                return commandKnowledge.instagram.response;
+            }
+            else if (/chatgpt|ai help|openai/.test(lowerInput)) {
+                commandKnowledge.chatgpt.action();
+                return commandKnowledge.chatgpt.response;
+            }
+            
+            // Check for personal info
+            else if (/who are you|about me|apne bare|aaftab|dudetalks/.test(lowerInput)) {
+                return [
+                    `Mera naam hai ${personalInfo.name}`,
+                    `Main creator hoon ${personalInfo.youtubeName} aur ${personalInfo.secondChannel} ka`,
+                    `Mera AI project hai ${personalInfo.aiProject}`,
+                    `Mere fans ka naam hai ${personalInfo.youtubeContent.audienceName}`
+                ].join('. ');
+            }
+            
+            // Check for animation queries
+            else if (/animation|animate|cartoon|video banane/.test(lower
